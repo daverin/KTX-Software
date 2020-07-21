@@ -138,6 +138,7 @@ function( CreateDocKTX )
     doxygen_add_docs(
         ktxpkg.doc
         pkgdoc/pages.md
+        pkgdoc/relnotes.md
         TODO.md
         interface/js_binding
         ALL

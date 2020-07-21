@@ -1,0 +1,109 @@
+#! /bin/bash
+
+# Generate release notes from git log.
+#
+# mkrelnotes [-d] [-p <preface> <this release> <last release>
+#
+# <preface> is inserted between the title and the detailed change list
+# that is extracted with git log. It should be used to summarize
+# new features and known issues using level 3 (###) headings for those
+# sections.
+#
+# If -d is not specified any previous relnotes.md file will be appended, with
+# the title lines stripped, to the release notes generated here, thus
+# enabling cumulative release notes.
+
+# Depth of this script relative to the project root
+depth=..
+#FORMAT="%ncommit %h @n%nAuthor: %aN %aE%n%n__%s__@n%n%b%n%n--"
+FORMAT="##### %s%ncommit %h @n%nAuthor: %aN %aE%n%n%b%n%n--"
+
+function log() {
+  part=$1
+  shift
+  LOG=$(git log --pretty="$FORMAT" ${lastrel}.. $*)
+  if [ -n "$LOG" ]; then
+    echo "### $part"
+    echo
+    # Remove trailing horizontal line marker
+    LOG=${LOG%--}
+    # Remove CR which some multi-line commit bodies contain for unknown reasons.
+    LOG=$(echo "$LOG" | tr -d \\r)
+    # Quotes are needed to prevent word splitting by the shell which, in effect,
+    # removes new lines and collapses all other spaces to a single space.
+    echo "$LOG"
+    echo
+  fi
+}
+
+while true; do
+  case $1 in
+    -d) deleteOld="true"; shift ;;
+    -p) preface=$2; shift 2 ;;
+    *) break ;;
+  esac
+done
+
+if [ $# -ne 2 ]; then
+  echo "$0: Need this release and last release identifiers."
+  exit 1
+else
+# thisrel=$1
+thisrel=v4.0.0-beta4
+# lastrel=$2
+lastrel=v4.0.0-beta3
+fi
+
+RELNOTES_FILE="relnotes.md"
+SAVED_RELNOTES_FILE="${RELNOTES_FILE%.md}-$lastrel.md"
+
+# Save or remove old relnotes.
+if [ -f $RELNOTES_FILE ]; then
+  if [ -n "$deleteOld" ]; then
+    rm $RELNOTES_FILE;
+  else
+    mv $RELNOTES_FILE $SAVED_RELNOTES_FILE
+  fi
+fi
+
+# Read preface file before cd.
+if [ -n "$preface" ]; then
+  PREFACE=$(cat $preface)
+fi
+
+# Change dir to the pkgdoc folder, a child of the script location...
+cd $(dirname $0)
+
+exec > $RELNOTES_FILE
+
+# Change to project root.
+pushd $depth > /dev/null
+
+
+echo "Release Notes        {#relnotes}"
+echo "============="
+echo
+echo "## Version ${thisrel#v}"
+echo
+if [ -n "$PREFACE" ]; then
+  echo "$PREFACE"
+  echo
+fi
+echo "### Changes since $lastrel (by part)"
+
+log libktx lib
+log Tools tools
+log "Tests" tests
+log "JS Wrappers" interface/js_binding 
+#log "Build System" CMakeLists.txt cmake
+#echo "## Build System Changes since $lastrel"
+#echo
+#git log --pretty="$FORMAT" ${lastrel}.. CMakeLists.txt cmake
+#git log --pretty="$FORMAT" ${lastrel}.. $(find . \( -path ./build -o -path ./.git -o -path ./other_include \) -prune -false -o -name CMakeLists.txt -o -name '*.cmake')
+
+popd > /dev/null
+
+if [ -f $SAVED_RELNOTES_FILE ]; then
+  awk '! /Release Notes/ && ! /======/ {print}' $SAVED_RELNOTES_FILE
+  rm $SAVED_RELNOTES_FILE
+fi
