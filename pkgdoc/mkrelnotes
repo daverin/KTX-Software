@@ -2,16 +2,19 @@
 
 # Generate release notes from git log.
 #
-# mkrelnotes [-d] [-p <preface> <this release> <last release>
+# mkrelnotes [-b] [-d] [-p <preface> <this release> <last release>
 #
 # <preface> is inserted between the title and the detailed change list
 # that is extracted with git log. It should be used to summarize
 # new features and known issues using level 3 (###) headings for those
 # sections.
 #
-# If -d is not specified any previous relnotes.md file will be appended, with
-# the title lines stripped, to the release notes generated here, thus
-# enabling cumulative release notes.
+# If -b is specified build system changes will be included in the
+# release # notes.
+#
+# If -d is specified any previous relnotes.md file will be deleted, otherwise
+# any such file will be appended, with the title lines stripped, to the release
+# notes generated here, thus enabling cumulative release notes.
 
 # Depth of this script relative to the project root
 depth=..
@@ -38,6 +41,7 @@ function log() {
 
 while true; do
   case $1 in
+    -b) includeBuildSystem="true"; shift ;;
     -d) deleteOld="true"; shift ;;
     -p) preface=$2; shift 2 ;;
     *) break ;;
@@ -94,12 +98,14 @@ echo "### Changes since $lastrel (by part)"
 log libktx lib
 log Tools tools
 log "Tests" tests
-log "JS Wrappers" interface/js_binding 
-#log "Build System" CMakeLists.txt cmake
-#echo "## Build System Changes since $lastrel"
-#echo
-#git log --pretty="$FORMAT" ${lastrel}.. CMakeLists.txt cmake
-#git log --pretty="$FORMAT" ${lastrel}.. $(find . \( -path ./build -o -path ./.git -o -path ./other_include \) -prune -false -o -name CMakeLists.txt -o -name '*.cmake')
+log "JS Wrappers" interface/js_binding
+if [ -n $includeBuildSystem ]; then
+  log "Build System" CMakeLists.txt cmake
+  echo "## Build System Changes since $lastrel"
+  echo
+  git log --pretty="$FORMAT" ${lastrel}.. CMakeLists.txt cmake
+  git log --pretty="$FORMAT" ${lastrel}.. $(find . \( -path ./build -o -path ./.git -o -path ./other_include \) -prune -false -o -name CMakeLists.txt -o -name '*.cmake')
+fi
 
 popd > /dev/null
 
