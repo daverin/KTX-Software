@@ -23,8 +23,6 @@ depth=.
 # has set as user.name in their git config. It usually has no relation
 # to their GitHub username so putting an @ before it has no meaning.
 #
-# Even if PR's the commit has the full name of the user as known to GitHub,
-# not their GitHub username.
 SUMMARY_FORMAT_W_AUTH="* %s (%h) (%an)"
 SUMMARY_FORMAT="* %s (%h)"
 
@@ -33,17 +31,19 @@ function commit_summary() {
   local summary
   local prjson
   pr=$(git log --oneline -n 1 $hash | grep -o -E "\(#[0-9]+\)" | grep -o -E "[0-9]+")
+  # Even in PR's the commit has the full name of the user as known to GitHub,
+  # not their GitHub username. We want to use the GitHub username so there will
+  # be a link back to the person. We can retrieve this by requesting detailed info
+  # from GitHub via HTTPS.
+  summary=$(git log --pretty="$SUMMARY_FORMAT" -n 1 $hash)
   if [ -z "$pr" ]; then
-    # We only use the author name from the commit when we have no other choice.
-    summary=$(git log --pretty="$SUMMARY_FORMAT_W_AUTH" -n 1 $hash)
+    cmtjson="$(curl -n https://api.github.com/repos/KhronosGroup/KTX-Software/commits/$hash 2>/dev/null)"
+    author="$(echo $cmtjson | jq -r -e '.author.login')"
   else
-    # It's a PR. Get the GitHub username of the author via the GitHub API
-    # so there is a link back to the person.
-    summary=$(git log --pretty="$SUMMARY_FORMAT" -n 1 $hash)
     prjson="$(curl -n https://api.github.com/repos/KhronosGroup/KTX-Software/pulls/$pr 2>/dev/null)"
-    author="$(echo $prjson | jq -r -e ".user.login")"
-    summary+=" (@$author)"
+    author="$(echo $prjson | jq -r -e '.user.login')"
   fi
+  summary+=" (@$author)"
   echo "$summary"
   if [ -n "$includeDetails" ]; then
     body="$(git log --pretty="%b" -n 1 $hash | sed -E 's/^(.+)/  \1/')"
