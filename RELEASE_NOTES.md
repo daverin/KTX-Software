@@ -1,0 +1,105 @@
+Release Notes
+=============
+## Version HEAD
+### New Features
+
+* `toktx` now supports 16-bit per component images as input for
+Basis Universal encoding. Previously they could only be used to
+create 16-bit format textures. It also supports using paletted
+images as input. These will be expanded to RGB8 or RGBA8 depending
+on presence of alpha.
+
+* The WASM modules for the libktx and msc_basis_transcoder JS
+bindings now include the BC7 and ETC_RG11 transcoders.
+
+### Notable Changes
+
+* `CompressBasisEx` in `libktx` now requires explicit setting of
+the `compressionLevel` in its `params` argument. To get the same
+behavior as before callers should set this field to
+`KTX_DEFAULT_ETC1S_COMPRESSION_LEVEL`.
+
+### Known Issues
+
+* Users making Basisu encoded or block compressed textures for WebGL
+must be aware of WebGL restrictions with regard to texture size and
+may need to resize images appropriately using the --resize feature
+of `toktx`.  In general the dimensions of block compressed textures
+must be a multiple of the block size and, if
+`WEBGL_compressed_texture_s3tc` on WebGL 1.0 is expected to be one
+of the targets, then the dimensions must be a power of 2.
+
+* Basis Universal encoding results (both ETC1S/LZ and UASTC) are
+non-deterministic across platforms. Results are valid but level
+sizes and data will differ slightly.
+See [issue #60](https://github.com/BinomialLLC/basis_universal/issues/60) in
+the basis_universal repository.
+
+* UASTC RDO results differ from run to run unless multi-threading
+is disabled. As with the preceeding issue results are valid but
+level sizes ``will differ slightly.
+See [issue #151](https://github.com/BinomialLLC/basis_universal/issues/151)
+in the basis_universal repository.
+
+### Changes since v4.0.0-beta3 (by part)
+### libktx
+
+* Bring repository into REUSE compliance (#291) (3c1fa2ab) (@null)
+
+* Update for latest vulkan_core.h. (0062e172) (@null)
+
+* git subrepo pull (merge) lib/dfdutils (5b20f0f9) (@null)
+
+* git subrepo pull (merge) lib/dfdutils (355fce8c) (@null)
+
+* Fix parent which changed due to a squash merge. (020e43e9) (@null)
+
+* Don't set dllexport outside libktx. (32a1a287) (@null)
+
+* Require explicit setting of ktxBasisParams.compressionLevel. (46bdc7cc) (@null)
+
+* Simplify --qlevel. Remove --no_multithreading. Fixes #275. (da5c204a) (@null)
+
+* Support PNG files with only gAMA and cHRM chunks. (#282) (0d851050) (@null)
+
+* Check support of enough levels & layers for format. (10ce7454) (@null)
+
+* Return early on empty hashlist. (fc73f886) (@null)
+
+* Fix compile and Doxygen warnings. (2c40ba4d) (@null)
+
+### Tools
+
+* Fix for wrong error message in ktx2check (#297) (96e41fdc) (@null)
+
+* Bring repository into REUSE compliance (#291) (3c1fa2ab) (@null)
+
+* Update for latest vulkan_core.h. (0062e172) (@null)
+
+* fix: By default create 1D texture when height == 1 (a3971738) (@null)
+
+* Simplify --qlevel. Remove --no_multithreading. Fixes #275. (da5c204a) (@null)
+
+* Support PNG files with only gAMA and cHRM chunks. (#282) (0d851050) (@null)
+
+* Fix more MSVS compile warnings. (e6cc8963) (@null)
+
+* Support 16-bit and paletted images. (8283ea50) (@null)
+
+* Remove PreAllocator<> and std::vector hacks from ImageT (d1e1b8f7) (@null)
+
+* Fix assertion in MSVC Debug (cd62c227) (@null)
+
+* Derive toktx from scapp/ktxapp & capture sc args in metadata (#256) (67855d1e) (@null)
+
+* Fix compile and Doxygen warnings. (2c40ba4d) (@null)
+
+
+
+### JS Wrappers
+
+* Bring repository into REUSE compliance (#291) (3c1fa2ab) (@null)
+
+* Add missing BC7_RGBA enum. Deprecate others. (571973e5) (@null)
+
+

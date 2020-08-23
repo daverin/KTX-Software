@@ -1,8 +1,14 @@
 #! /bin/bash
 
+# Copyright 2020, Mark Callow
+# SPDX-License-Identifier: Apache-2.0
+
 # Generate release notes from git log.
 #
-# mkrelnotes [-b] [-d] [-p <preface> <this release> <last release>
+# mkrelnotes [-b] [-c] [-d] [-p <preface> [-t] <two-dot revision range>
+#
+# <commit range> is the range of the Git commits to consider, typically
+# something like last_release_tag..this_release_tag.
 #
 # <preface> is inserted between the title and the detailed change list
 # that is extracted with git log. It should be used to summarize
@@ -12,12 +18,24 @@
 # If -b is specified build system changes will be included in the
 # release # notes.
 #
-# If -d is specified any previous relnotes.md file will be deleted, otherwise
-# any such file will be appended, with the title lines stripped, to the release
-# notes generated here, thus enabling cumulative release notes.
+# If -c is specified any previous $RELNOTES_FILE will be appended, with the
+# title lines stripped, to the release notes generated here, thus enabling
+# cumulative release notes. Otherwise any previous $RELNOTES_FILE file is
+# replaced.
+#
+# If -d is specified details of the changes will be included, otherwise only
+# the summary is shown.
+#
+# If -i is specified the release notes will be built interactively. That is,
+# for each change the user will be asked if it should be included.
+#
+# If -t is specified changes to the tests will be included in the release notes
+# otherwise they are omitted.
 
 # Depth of this script relative to the project root
 depth=.
+
+RELNOTES_FILE="RELEASE_NOTES.md"
 
 # The author name in a commit message comes from whatever the user
 # has set as user.name in their git config. It usually has no relation
@@ -63,7 +81,7 @@ function revisions_in () {
 function log() {
   local part=$1; shift
   local log
-  for rev in $(revisions_in "${lastrel}.." $*); do
+  for rev in $(revisions_in "$range" $*); do
     # For reasons I do not understand I have been completely unable to prevent
     # trailing newlines from being removed from the output of commit_summary
     # so resorting to ANSI-C quoting to insert some new lines between summaries.
@@ -78,28 +96,40 @@ function log() {
   fi
 }
 
+function usage() {
+  echo "Usage: $0 [-b] [-c] [-d] [-p <preface>] [-t] <commit range>"
+}
+
 while true; do
   case $1 in
     -b) includeBuildSystem="true"; shift ;;
     -c) cumulative="true"; shift;;
     -d) includeDetails="true"; shift ;;
+    -i) interactive="true"; shift;;
     -p) preface=$2; shift 2 ;;
     -t) includeTests="true"; shift ;;
+    -*) usage; exit 1 ;;
     *) break ;;
   esac
 done
 
-if [ $# -ne 2 ]; then
-  echo "$0: Need this release and last release identifiers."
+if [ $# -ne 1 ]; then
+  echo '$0: Need a two-dot revision range, e.g, `v4.0.0..v4.0.1`.'
   exit 1
 else
-# thisrel=$1
-thisrel=v4.0.0-beta4
-# lastrel=$2
-lastrel=v4.0.0-beta3
+  range=$1
+  if ! [[ $range =~ ([[:alnum:][:punct:]]+)\.\.([[:alnum:][:punct:]]*) ]]; then
+    echo "$0: <revision range> is not a two-dot range."
+    exit 1
+  else
+    lastrel=${BASH_REMATCH[1]}
+    thisrel=${BASH_REMATCH[2]}
+    if [ -z "$lastrel" ]; then
+      lastrel=HEAD
+    fi
+  fi
 fi
 
-RELNOTES_FILE="CHANGELOG.md"
 SAVED_RELNOTES_FILE="${RELNOTES_FILE%.md}-$lastrel.md"
 
 # Save or remove old relnotes.
@@ -116,9 +146,10 @@ if [ -n "$preface" ]; then
   PREFACE=$(cat $preface)
 fi
 
-# Change dir to the pkgdoc folder, a child of the script location...
+# Change to the directory where the script is.
 cd $(dirname $0)
 
+# Redirect output for all commands.
 exec > $RELNOTES_FILE
 
 # Change to project root.
@@ -126,7 +157,9 @@ pushd $depth > /dev/null
 
 lib=$(log libktx lib)
 tools=$(log Tools tools)
-tests=$(log "Tests" tests)
+if [ -n "$includeTests" ]; then
+  tests=$(log "Tests" tests)
+fi
 js_binding=$(log "JS Wrappers" interface/js_binding)
 
 if [ -n "$includeBuildSystem" ]; then
@@ -139,11 +172,16 @@ Release Notes
 =============
 ## Version ${thisrel#v}
 $PREFACE
+
 ### Changes since $lastrel (by part)
 $lib
+
 $tools
+
 $tests
+
 $js_binding
+
 $cmake
 EOF
 
