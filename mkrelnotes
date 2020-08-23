@@ -82,10 +82,46 @@ function log() {
   local part=$1; shift
   local log
   for rev in $(revisions_in "$range" $*); do
+    if [ -n "$interactive" ]; then
+      git log -1 $rev > /dev/tty
+
+      processed=0
+      while [ $processed -eq 0 ]; do
+        echo "Include this change? [d,i,s,?] ?" > /dev/tty
+        read -n 1 opt
+        echo "" > /dev/tty
+
+        case $opt in
+          d)
+            git show --pretty=oneline $rev > /dev/tty
+            ;;
+          [is])
+            processed=1
+            ;;
+          ?)
+            echo "d - show diff of this commit" > /dev/tty
+            echo "i - include this commit." > /dev/tty
+            echo "s - skip this commit." > /dev/tty
+            echo "? - display this help message." > /dev/tty
+            ;;
+          *)
+            echo "Unknown option: $opt. Try again." > /dev/tty
+            ;;
+        esac
+      done
+
+      case $opt in
+        i)
+          log+="$(commit_summary $rev)"
+          ;;
+      esac
+
+    else
+      log+="$(commit_summary $rev)"
+    fi
     # For reasons I do not understand I have been completely unable to prevent
     # trailing newlines from being removed from the output of commit_summary
     # so resorting to ANSI-C quoting to insert some new lines between summaries.
-    log+="$(commit_summary $rev)"
     log+=$'\n\n'
   done
   if [ -n "$log" ]; then
@@ -118,7 +154,7 @@ if [ $# -ne 1 ]; then
   exit 1
 else
   range=$1
-  if ! [[ $range =~ ([[:alnum:][:punct:]]+)\.\.([[:alnum:][:punct:]]*) ]]; then
+  if ! [[ $range =~ ([[:alnum:][:punct:]]+)\.\.([[:alnum:]][[:alnum:][:punct:]]*)? ]]; then
     echo "$0: <revision range> is not a two-dot range."
     exit 1
   else
@@ -149,9 +185,6 @@ fi
 # Change to the directory where the script is.
 cd $(dirname $0)
 
-# Redirect output for all commands.
-exec > $RELNOTES_FILE
-
 # Change to project root.
 pushd $depth > /dev/null
 
@@ -167,7 +200,7 @@ if [ -n "$includeBuildSystem" ]; then
 fi
 
 
-cat <<- EOF
+cat > $RELNOTES_FILE <<- EOF
 Release Notes
 =============
 ## Version ${thisrel#v}
@@ -189,6 +222,6 @@ EOF
 popd > /dev/null
 
 if [ -f $SAVED_RELNOTES_FILE ]; then
-  awk '! /Release Notes/ && ! /======/ {print}' $SAVED_RELNOTES_FILE
+  awk '! /Release Notes/ && ! /======/ {print}' $SAVED_RELNOTES_FILE >> $RELNOTES_FILE
   rm $SAVED_RELNOTES_FILE
 fi
