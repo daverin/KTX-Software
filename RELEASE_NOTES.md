@@ -1,6 +1,6 @@
 Release Notes
 =============
-## Version HEAD
+## Version 4.0.0-b4test2
 ### New Features
 
 * `toktx` now supports 16-bit per component images as input for
@@ -18,6 +18,8 @@ bindings now include the BC7 and ETC_RG11 transcoders.
 the `compressionLevel` in its `params` argument. To get the same
 behavior as before callers should set this field to
 `KTX_DEFAULT_ETC1S_COMPRESSION_LEVEL`.
+
+* The JS wrappers are now compiled with `-O3` optimization leading to about a 2x performance increase at the cost of a small size increase.
 
 ### Known Issues
 
@@ -44,62 +46,66 @@ in the basis_universal repository.
 ### Changes since v4.0.0-beta3 (by part)
 ### libktx
 
-* Bring repository into REUSE compliance (#291) (3c1fa2ab) (@null)
+* Bring repository into REUSE compliance (#291) (3c1fa2ab) (@oddhack)
 
-* Update for latest vulkan_core.h. (0062e172) (@null)
+* Update for latest vulkan_core.h. (0062e172) (@MarkCallow)
 
-* git subrepo pull (merge) lib/dfdutils (5b20f0f9) (@null)
+* git subrepo pull (merge) lib/dfdutils (5b20f0f9) (@MarkCallow)
 
-* git subrepo pull (merge) lib/dfdutils (355fce8c) (@null)
+* git subrepo pull (merge) lib/dfdutils (355fce8c) (@MarkCallow)
 
-* Fix parent which changed due to a squash merge. (020e43e9) (@null)
+* Fix parent which changed due to a squash merge. (020e43e9) (@MarkCallow)
 
-* Don't set dllexport outside libktx. (32a1a287) (@null)
+* Don't set dllexport outside libktx. (32a1a287) (@MarkCallow)
 
-* Require explicit setting of ktxBasisParams.compressionLevel. (46bdc7cc) (@null)
+* Require explicit setting of ktxBasisParams.compressionLevel. (46bdc7cc) (@MarkCallow)
 
-* Simplify --qlevel. Remove --no_multithreading. Fixes #275. (da5c204a) (@null)
+* Simplify --qlevel. Remove --no_multithreading. Fixes #275. (da5c204a) (@MarkCallow)
 
-* Support PNG files with only gAMA and cHRM chunks. (#282) (0d851050) (@null)
+* Support PNG files with only gAMA and cHRM chunks. (#282) (0d851050) (@MarkCallow)
 
-* Check support of enough levels & layers for format. (10ce7454) (@null)
+* Check support of enough levels & layers for format. (10ce7454) (@MarkCallow)
 
-* Return early on empty hashlist. (fc73f886) (@null)
+* Return early on empty hashlist. (fc73f886) (@MarkCallow)
 
-* Fix compile and Doxygen warnings. (2c40ba4d) (@null)
+* Fix compile and Doxygen warnings. (2c40ba4d) (@MarkCallow)
 
 ### Tools
 
-* Fix for wrong error message in ktx2check (#297) (96e41fdc) (@null)
+* Fixed levelCount check when levelCount is 0 (d85bdb66) (@pdaehne)
 
-* Bring repository into REUSE compliance (#291) (3c1fa2ab) (@null)
+* Fixed missing check for bytes/plane == 0 when supercompressing standard Vulkan texture formats (#299) (f5e05425) (@pdaehne)
 
-* Update for latest vulkan_core.h. (0062e172) (@null)
+* Fix for wrong error message in ktx2check (#297) (96e41fdc) (@pdaehne)
 
-* fix: By default create 1D texture when height == 1 (a3971738) (@null)
+* Bring repository into REUSE compliance (#291) (3c1fa2ab) (@oddhack)
 
-* Simplify --qlevel. Remove --no_multithreading. Fixes #275. (da5c204a) (@null)
+* Update for latest vulkan_core.h. (0062e172) (@MarkCallow)
 
-* Support PNG files with only gAMA and cHRM chunks. (#282) (0d851050) (@null)
+* fix: By default create 1D texture when height == 1 (a3971738) (@kacprzak)
 
-* Fix more MSVS compile warnings. (e6cc8963) (@null)
+* Simplify --qlevel. Remove --no_multithreading. Fixes #275. (da5c204a) (@MarkCallow)
 
-* Support 16-bit and paletted images. (8283ea50) (@null)
+* Support PNG files with only gAMA and cHRM chunks. (#282) (0d851050) (@MarkCallow)
 
-* Remove PreAllocator<> and std::vector hacks from ImageT (d1e1b8f7) (@null)
+* Fix more MSVS compile warnings. (e6cc8963) (@MarkCallow)
 
-* Fix assertion in MSVC Debug (cd62c227) (@null)
+* Support 16-bit and paletted images. (8283ea50) (@MarkCallow)
 
-* Derive toktx from scapp/ktxapp & capture sc args in metadata (#256) (67855d1e) (@null)
+* Remove PreAllocator<> and std::vector hacks from ImageT (d1e1b8f7) (@zeux)
 
-* Fix compile and Doxygen warnings. (2c40ba4d) (@null)
+* Fix assertion in MSVC Debug (cd62c227) (@zeux)
+
+* Derive toktx from scapp/ktxapp & capture sc args in metadata (#256) (67855d1e) (@MarkCallow)
+
+* Fix compile and Doxygen warnings. (2c40ba4d) (@MarkCallow)
 
 
 
 ### JS Wrappers
 
-* Bring repository into REUSE compliance (#291) (3c1fa2ab) (@null)
+* Bring repository into REUSE compliance (#291) (3c1fa2ab) (@oddhack)
 
-* Add missing BC7_RGBA enum. Deprecate others. (571973e5) (@null)
+* Add missing BC7_RGBA enum. Deprecate others. (571973e5) (@MarkCallow)
 
 
