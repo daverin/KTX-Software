@@ -121,8 +121,8 @@ before_deploy:
     esac
 
 deploy:
-  - edge: true # Use bleeding edge (dplv2)
   - provider: pages
+    edge: true # Use bleeding edge (dplv2)
     skip-cleanup: true
     github-token: $GITHUB_TOKEN  # Set in the repo settings page as a secure variable
     local-dir: build-macos/docs/html
@@ -131,6 +131,7 @@ deploy:
       condition: $TRAVIS_OS_NAME = osx
       tags: true
   - provider: releases
+    edge: true # Use bleeding edge (dplv2)
     api_key: $GITHUB_TOKEN  # Set in the repo settings page as a secure variable
     file_glob: true
     file:
@@ -146,6 +147,7 @@ deploy:
       #branch: master
       condition: $TRAVIS_OS_NAME = osx
   - provider: releases
+    edge: true # Use bleeding edge (dplv2)
     api_key: $GITHUB_TOKEN  # Set in the repo settings page as a secure variable
     file_glob: true
     file:
