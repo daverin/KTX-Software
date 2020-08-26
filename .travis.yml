@@ -137,7 +137,7 @@ deploy:
     file:
       - build-macos/KTX-Software-*.pkg
     # This goes to the release description so covers all versions.
-    release_notes_file: RELEASE_NOTES.md
+    #release_notes_file: RELEASE_NOTES.md
     skip_cleanup: true
     draft: true
     prerelease: true
