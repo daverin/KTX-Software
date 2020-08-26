@@ -5,10 +5,13 @@
 
 # Generate release notes from git log.
 #
-# mkrelnotes [-b] [-c] [-d] [-p <preface> [-t] <two-dot revision range>
+# mkrelnotes [-b] [-c] [-d] [-p <preface> [-t] <previous release tag> <this release>
 #
-# <commit range> is the range of the Git commits to consider, typically
-# something like last_release_tag..this_release_tag.
+# <previous release tag> is the name of the tag identifying the previous
+# release. <this release> is the name to be given to the tag for the upcoming
+# release. N.B. this tag cannot be created until after ther release notes
+# have been generated and checked in. The release notes will include changes
+# in the two-dot commit range <previous release tag>..HEAD.
 #
 # <preface> is inserted between the title and the detailed change list
 # that is extracted with git log. It should be used to summarize
@@ -149,22 +152,31 @@ while true; do
   esac
 done
 
-if [ $# -ne 1 ]; then
-  echo '$0: Need a two-dot revision range, e.g, `v4.0.0..v4.0.1`.'
+if [ $# -ne 2 ]; then
+  echo '$0: Need previous release tag and this release name, e.g. `v4.0.0 v4.0.1`.'
   exit 1
 else
-  range=$1
-  if ! [[ $range =~ ([[:alnum:][:punct:]]+)\.\.([[:alnum:]][[:alnum:][:punct:]]*)? ]]; then
-    echo "$0: <revision range> is not a two-dot range."
-    exit 1
-  else
-    lastrel=${BASH_REMATCH[1]}
-    thisrel=${BASH_REMATCH[2]}
-    if [ -z "$lastrel" ]; then
-      lastrel=HEAD
-    fi
-  fi
+  range=$1..
+  lastrel=$1
+  thisrel=$2
 fi
+
+#if [ $# -ne 1 ]; then
+#  echo '$0: Need a two-dot revision range, e.g, `v4.0.0..v4.0.1`.'
+#  exit 1
+#else
+#  range=$1
+#  if ! [[ $range =~ ([[:alnum:][:punct:]]+)\.\.([[:alnum:]][[:alnum:][:punct:]]*)? ]]; then
+#    echo "$0: <revision range> is not a two-dot range."
+#    exit 1
+#  else
+#    lastrel=${BASH_REMATCH[1]}
+#    thisrel=${BASH_REMATCH[2]}
+#    if [ -z "$lastrel" ]; then
+#      lastrel=HEAD
+#    fi
+#  fi
+#fi
 
 SAVED_RELNOTES_FILE="${RELNOTES_FILE%.md}-$lastrel.md"
 
@@ -201,6 +213,8 @@ fi
 
 
 cat > $RELNOTES_FILE <<- EOF
+$(date '+<!-- Copyright %Y, The Khronos Group Inc. -->')
+<!-- SPDX-License-Identifier: Apache-2.0 -->
 Release Notes
 =============
 ## Version ${thisrel#v}
