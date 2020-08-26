@@ -139,6 +139,7 @@ deploy:
     release_notes_file: RELEASE_NOTES.md
     skip_cleanup: true
     draft: true
+    name: $TRAVIS_TAG
     prerelease: true
     on:
       tags: true
@@ -152,6 +153,7 @@ deploy:
       - build-web-release/KTX-Software-*-Web-*.zip
     skip_cleanup: true
     draft: true
+    name: $TRAVIS_TAG
     prerelease: true
     on:
       tags: true
