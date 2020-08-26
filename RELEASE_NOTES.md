@@ -1,6 +1,8 @@
+<!-- Copyright 2020, The Khronos Group Inc. -->
+<!-- SPDX-License-Identifier: Apache-2.0 -->
 Release Notes
 =============
-## Version 4.0.0-b4test2
+## Version 4.0.0-b4test3
 ### New Features
 
 * `toktx` now supports 16-bit per component images as input for
