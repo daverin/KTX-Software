@@ -1020,16 +1020,16 @@ toktxApp::main(int argc, _TCHAR *argv[])
             ret = KTX_SUCCESS;
         }
         if (KTX_SUCCESS == ret) {
-            if (options.zcmp) {
-                ret = ktxTexture2_DeflateZstd((ktxTexture2*)texture,
-                                               options.zcmpLevel);
-                if (KTX_SUCCESS != ret) {
-                    cerr << name << ": Zstd deflation failed; KTX error: "
-                         << ktxErrorString(ret) << endl;
-                    exitCode = 2;
-                    goto cleanup;
-                }
-            }
+            // if (options.zcmp) {
+            //     ret = ktxTexture2_DeflateZstd((ktxTexture2*)texture,
+            //                                    options.zcmpLevel);
+            //     if (KTX_SUCCESS != ret) {
+            //         cerr << name << ": Zstd deflation failed; KTX error: "
+            //              << ktxErrorString(ret) << endl;
+            //         exitCode = 2;
+            //         goto cleanup;
+            //     }
+            // }
             if (!getParamsStr().empty()) {
                 ktxHashList_AddKVPair(&texture->kvDataHead, scparamKey.c_str(),
                 (ktx_uint32_t)getParamsStr().length(), getParamsStr().c_str());

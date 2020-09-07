@@ -47,6 +47,10 @@ endif()
 # option( KTX_FEATURE_KTX2 "KTX version 2" ON )
 # option( KTX_FEATURE_WRITE "Create KTX files" ON )
 
+option( KTX_UNITY_LIB "Build a library for use in Unity 3D" OFF )
+option( KTX_UNITY_LIB_BASISU "Support for loading Basis Universal (.basis) files in Unity 3D" ON )
+set( UNITY_PACKAGE_PATH "" CACHE PATH "Path locating the Unity package source. When installing, native libraries will get injected there" )
+
 set( KTX_FEATURE_WRITE ON )
 set( KTX_FEATURE_KTX1 ON )
 set( KTX_FEATURE_KTX2 ON )
@@ -144,6 +148,7 @@ add_library( ktx ${LIB_TYPE}
     lib/vkformat_check.c
     lib/vkformat_enum.h
     lib/vkformat_str.c
+    lib/sgd_helper.cpp
     )
 
 set_target_properties(ktx PROPERTIES
@@ -510,6 +515,11 @@ PUBLIC
     utils
 )
 
+if(KTX_UNITY_LIB)
+    add_subdirectory(interface/c_binding)
+    add_subdirectory(interface/unity)
+endif()
+
 add_subdirectory(interface/basisu_c_binding)
 
 # Tools
@@ -670,7 +680,7 @@ cpack_add_component(tools
     DEPENDS library
 )
 cpack_add_component(dev
-    DISPLAY_NAME "Development"
+    DISPLAY_NAME "Apple Development"
     DESCRIPTION "Additional resources for development (header files and documentation)"
     DEPENDS library
     DISABLED

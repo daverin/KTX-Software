@@ -893,8 +893,8 @@ ktxTexture2_CreateFromMemory(const ktx_uint8_t* bytes, ktx_size_t size,
 KTX_API KTX_error_code KTX_APIENTRY
 ktxTexture2_CompressBasis(ktxTexture2* This, ktx_uint32_t quality);
 
-KTX_API KTX_error_code KTX_APIENTRY
-ktxTexture2_DeflateZstd(ktxTexture2* This, ktx_uint32_t level);
+// KTX_API KTX_error_code KTX_APIENTRY
+// ktxTexture2_DeflateZstd(ktxTexture2* This, ktx_uint32_t level);
 
 KTX_API void KTX_APIENTRY
 ktxTexture2_GetComponentInfo(ktxTexture2* This, ktx_uint32_t* numComponents,

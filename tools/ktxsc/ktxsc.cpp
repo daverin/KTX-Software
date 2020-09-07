@@ -314,17 +314,17 @@ ktxSupercompressor::main(int argc, _TCHAR *argv[])
                     result = KTX_SUCCESS;
                 }
                 if (KTX_SUCCESS == result) {
-                    if (options.zcmp) {
-                        result = ktxTexture2_DeflateZstd((ktxTexture2*)texture,
-                                                          options.zcmpLevel);
-                        if (KTX_SUCCESS != result) {
-                            cerr << name << ": Zstd deflation failed; "
-                                            "KTX error: "
-                                 << ktxErrorString(result) << endl;
-                            exitCode = 2;
-                            goto cleanup;
-                        }
-                    }
+                    // if (options.zcmp) {
+                    //     result = ktxTexture2_DeflateZstd((ktxTexture2*)texture,
+                    //                                       options.zcmpLevel);
+                    //     if (KTX_SUCCESS != result) {
+                    //         cerr << name << ": Zstd deflation failed; "
+                    //                         "KTX error: "
+                    //              << ktxErrorString(result) << endl;
+                    //         exitCode = 2;
+                    //         goto cleanup;
+                    //     }
+                    // }
                 }
                 if (!getParamsStr().empty()) {
                     ktxHashList_AddKVPair(&texture->kvDataHead, scparamKey.c_str(),
