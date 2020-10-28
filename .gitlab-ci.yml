@@ -6,6 +6,7 @@ release:
   stage: release
   before_script:
     - apt-get update && apt-get install -y --no-install-recommends git-core ca-certificates git-lfs
+    - git lfs fetch --all
     - npm install -g semantic-release @semantic-release/gitlab @semantic-release/git @semantic-release/changelog
   script:
     - semantic-release
