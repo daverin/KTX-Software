@@ -5,10 +5,11 @@ release:
   image: node:12-buster-slim
   stage: release
   before_script:
-    - apt-get update && apt-get install -y --no-install-recommends git-core ca-certificates git-lfs
-    - git lfs fetch --all
+    - apt-get update && apt-get install -y --no-install-recommends git-core ca-certificates
     - npm install -g semantic-release @semantic-release/gitlab @semantic-release/git @semantic-release/changelog
   script:
     - semantic-release
   only:
     - prod
+  variables:
+    GIT_LFS_SKIP_SMUDGE: 1
